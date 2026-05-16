@@ -47,7 +47,10 @@ RPCManager::RPCManager(Config::Config* _Config, BG::Common::Logger::LoggingSyste
     // AddRoute("Debug/Echo", std::bind(&RPCManager::Echo, this, std::placeholders::_1));
     
 
-    int ThreadCount = std::thread::hardware_concurrency();
+    unsigned int ThreadCount = std::thread::hardware_concurrency();
+    if (ThreadCount == 0) {
+        ThreadCount = 1;
+    }
     _Logger->Log("Starting RPC Server With '" + std::to_string(ThreadCount) + "' Threads", 5);
     
     // Start the RPC server asynchronously with the specified thread count
