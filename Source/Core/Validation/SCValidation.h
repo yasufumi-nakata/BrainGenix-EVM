@@ -11,12 +11,16 @@
 #pragma once
 
 // Standard Libraries (BG convention: use <> instead of "")
+#include <string>
 
 // Third-Party Libraries (BG convention: use <> instead of "")
 //#include <nlohmann/json.hpp>
 
 
 // Internal Libraries (BG convention: use <> instead of "")
+#include <RPC/SafeClient.h>
+
+#include <BG/Common/Logger/Logger.h>
 
 
 namespace BG {
@@ -36,6 +40,6 @@ struct ValidationConfig {
  * @param _Config Configuration settings used.
  * @return True if successfully carried out.
  */
-bool SCVAlidate(SafeClient & _Client, const std::string & _KGTSaveName, const std::string & _EmuSaveName, const ValidationConfig & _Config);
+bool SCVAlidate(BG::Common::Logger::LoggingSystem* _Logger, SafeClient & _Client, const std::string & _KGTSaveName, const std::string & _EmuSaveName, const ValidationConfig & _Config);
 
 } // BG

@@ -9,6 +9,7 @@
 // Third-Party Libraries (BG convention: use <> instead of "")
 
 // Internal Libraries (BG convention: use <> instead of "")
+#include <Metrics/N1Metrics.h>
 #include <NESInteraction/NESSimLoad.h>
 #include <PCRegistration/SimpleRegistration.h>
 #include <Validation/SCValidation.h>
@@ -26,19 +27,23 @@ namespace BG {
  * @param _Config Configuration settings used.
  * @return True if successfully carried out.
  */
-bool SCVAlidate(SafeClient & _Client, const std::string & _KGTSaveName, const std::string & _EmuSaveName, const ValidationConfig & _Config) {
+bool SCVAlidate(BG::Common::Logger::LoggingSystem* _Logger, SafeClient & _Client, const std::string & _KGTSaveName, const std::string & _EmuSaveName, const ValidationConfig & _Config) {
 
-	Logger_->Log("Commencing validation of Simple Compartmental ground-truth and emulation systems.",1);
+	if (_Logger == nullptr) {
+		return false;
+	}
+
+	_Logger->Log("Commencing validation of Simple Compartmental ground-truth and emulation systems.",1);
 
 	// Load the specified ground-truth system.
 	int KGTSimID;
-	if (!AwaitNESSimLoad(_Client, _KGTSaveName, KGTSimID, Config.Timeout_ms)) {
+	if (!AwaitNESSimLoad(_Logger, _Client, _KGTSaveName, KGTSimID, _Config.Timeout_ms)) {
 		return false;
 	}
 
 	// Load the specified emulation system.
 	int EmuSimID;
-	if (!AwaitNESSimLoad(_Client, _EmuSaveName, EmuSimID, Config.Timeout_ms)) {
+	if (!AwaitNESSimLoad(_Logger, _Client, _EmuSaveName, EmuSimID, _Config.Timeout_ms)) {
 		return false;
 	}
 
