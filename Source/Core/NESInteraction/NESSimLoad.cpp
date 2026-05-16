@@ -27,9 +27,9 @@ bool GetNESStatus(BG::Common::Logger::LoggingSystem* _Logger, SafeClient & _Clie
     	return false;
 	}
 
-	nlohmann::json ResponseJSON(Response);
-	auto Iterator = Response.find("StatusCode");
-	if (Iterator == Response.end()) {
+	nlohmann::json ResponseJSON = nlohmann::json::parse(Response);
+	auto Iterator = ResponseJSON.find("StatusCode");
+	if (Iterator == ResponseJSON.end()) {
 		_Logger->Log("No 'StatusCode' in loading status response", 7);
 		return false;
 	}
@@ -86,9 +86,14 @@ bool AwaitNESSimLoad(BG::Common::Logger::LoggingSystem* _Logger, SafeClient & _C
 
 	// Start a simulation load request.
 
-	std::string SimLoadRequest("[{\"ReqID\":0,\"Simulation/Load\": { \"SavedSimName\": "+_SimSaveName+" } }]");
+	nlohmann::json SimLoadRequest = nlohmann::json::array({
+		{
+			{"ReqID", 0},
+			{"Simulation/Load", {{"SavedSimName", _SimSaveName}}}
+		}
+	});
 	std::string Response;
-	bool Status = _Client.MakeJSONQuery("Simulation/Load", SimLoadRequest, &Response);
+	bool Status = _Client.MakeJSONQuery("Simulation/Load", SimLoadRequest.dump(), &Response);
 
 	if (!Status) {
         _Logger->Log("Error During Simulation Load Request To NES", 7);
@@ -97,7 +102,7 @@ bool AwaitNESSimLoad(BG::Common::Logger::LoggingSystem* _Logger, SafeClient & _C
 
 	// Wait for status to indicate that loading completed or failed.
 
-	if (!AwaitNESOutcome(_Client, _Timeout_ms)) {
+	if (!AwaitNESOutcome(_Logger, _Client, _Timeout_ms)) {
 		_Logger->Log("Awaiting completion of NES load request failed", 7);
 		return false;
 	}
