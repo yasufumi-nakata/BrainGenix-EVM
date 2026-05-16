@@ -4,6 +4,7 @@
 
 
 // Standard Libraries (BG convention: use <> instead of "")
+#include <string>
 #include <thread>
 
 // Third-Party Libraries (BG convention: use <> instead of "")
@@ -30,15 +31,23 @@ namespace BG {
  */
 bool SimpleRegistration(SafeClient & _Client, int _SimIDA, int _SimIDB, std::vector<int> & _RegistrationMap) {
 
-	Logger_->Log("Simple Registration of one simulation network onto another", 1);
+	_RegistrationMap.clear();
 
 	// 1. Request the soma positions of SimIDA
 	std::string SimIDASomasRequest("[{\"ReqID\":0,\"Simulation/GetSomaPositions\": { \"SimID\": "+std::to_string(_SimIDA)+" } }]");
-	bool Status = _Client.MakeJSONQuery("Simulation/GetSomaPositions", SimIDASomasRequest, &Response);
+	std::string SimIDASomasResponse;
+	bool Status = _Client.MakeJSONQuery("Simulation/GetSomaPositions", SimIDASomasRequest, &SimIDASomasResponse);
+	if (!Status) {
+		return false;
+	}
 
 	// 2. Request the soma positions of SimIDB
 	std::string SimIDBSomasRequest("[{\"ReqID\":0,\"Simulation/GetSomaPositions\": { \"SimID\": "+std::to_string(_SimIDB)+" } }]");
-	bool Status = _Client.MakeJSONQuery("Simulation/GetSomaPositions", SimIDASomasRequest, &Response);
+	std::string SimIDBSomasResponse;
+	Status = _Client.MakeJSONQuery("Simulation/GetSomaPositions", SimIDBSomasRequest, &SimIDBSomasResponse);
+	if (!Status) {
+		return false;
+	}
 
 	// 3. Center both networks.
 
@@ -46,6 +55,8 @@ bool SimpleRegistration(SafeClient & _Client, int _SimIDA, int _SimIDB, std::vec
 
 	// 5. Return registered correspondence ID map.
 
+	// Registration scoring is not implemented yet, so report failure instead of returning an empty success map.
+	return false;
 }
 
 }; // Close Namespace BG

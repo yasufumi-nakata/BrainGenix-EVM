@@ -11,6 +11,7 @@
 #pragma once
 
 // Standard Libraries (BG convention: use <> instead of "")
+#include <vector>
 
 // Third-Party Libraries (BG convention: use <> instead of "")
 //#include <nlohmann/json.hpp>
