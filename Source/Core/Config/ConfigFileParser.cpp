@@ -44,8 +44,24 @@ ConfigFileParser::ConfigFileParser(Config &_Config) {
 
 
     // Populate Configuration Struct With Data From Configuration File
-    _Config.PortNumber = Config["Network_EVM_API_Port"].as<int>();
-    _Config.Host = Config["Network_EVM_API_Host"].as<std::string>();
+    auto ReportInvalidConfigAndExit = [&](const std::string &Message) {
+        std::cerr<<"[FATAL], Invalid Config File: "<<Message<<"\n";
+        exit(1);
+    };
+
+    try {
+        if (!Config["Network_EVM_API_Port"]) {
+            ReportInvalidConfigAndExit("Missing required key Network_EVM_API_Port");
+        }
+        if (!Config["Network_EVM_API_Host"]) {
+            ReportInvalidConfigAndExit("Missing required key Network_EVM_API_Host");
+        }
+
+        _Config.PortNumber = Config["Network_EVM_API_Port"].as<int>();
+        _Config.Host = Config["Network_EVM_API_Host"].as<std::string>();
+    } catch(const YAML::Exception& e) {
+        ReportInvalidConfigAndExit(e.what());
+    }
 
 }
 
